@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:07:06 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/02 15:37:43 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/02 15:43:43 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ void	ft_lstclear(t_list **lst, void (*del)(void*))
 	free(current);
 	*lst = NULL;
 }
+
 size_t	ft_strlen(const char *s)
 {
 	const char	*iterator;

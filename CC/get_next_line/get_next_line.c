@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:06:48 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/02 15:31:58 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/02 16:22:57 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 #include "get_next_line.h"
 #define BUFFER_SIZE 10
 
-char	*ft_buffer(int fd)
+static char	*ft_buffer(int fd)
 {
 	char	*buffer;
 	int		char_read;
@@ -34,7 +34,7 @@ char	*ft_buffer(int fd)
 	return (buffer);
 }
 
-t_list	*ft_get_list(t_list *lst, int fd, size_t *len)
+static t_list	*ft_get_list(t_list *lst, int fd, size_t *len)
 {
 	char	*buffer;
 	size_t	i;
@@ -57,7 +57,7 @@ t_list	*ft_get_list(t_list *lst, int fd, size_t *len)
 	return (lst);
 }
 
-char	*ft_get_newline(t_list *lst, size_t *len)
+static char	*ft_get_newline(t_list *lst, size_t *len)
 {
 	char	*content;
 	char	*str;
@@ -85,42 +85,30 @@ char	*ft_get_newline(t_list *lst, size_t *len)
 	return (start);
 }
 
-void	ft_find_offset(t_list *lst, size_t *len, size_t *offset)
-{
-	*offset = 0;
-	while (lst)
-	{
-		if (ft_strlen(lst->content) < *len)
-		{
-			*len -= ft_strlen(lst->content);
-			lst = lst->next;
-		}
-		else
-		{
-			*offset = *len + 1;
-			return ;
-		}
-	}
-}
-
-t_list	*ft_clean_list(t_list *lst, size_t *len)
+static t_list	*ft_clean_list(t_list *lst, size_t *len)
 {
 	char	*buffer;
-	char	*str;
-	size_t	offset;
+	char	*str;	
 	size_t	size;
 	char	*start;
 
 	size = 0;
 	if (lst == NULL)
 		return (NULL);
-	ft_find_offset(&lst, &len, &offset);
-	start = lst->content + offset;
+	while (lst->next)
+	{
+		if (ft_strlen(lst->content) < *len)
+			*len -= ft_strlen(lst->content);		
+		else		
+			len += 2;		
+		lst = lst->next;
+	}
+	start = lst->content + *len;
 	str = (char *)lst->content;
-	while (str[offset])
+	while (str[*len])
 	{
 		size++;
-		offset++;
+		(*len)++;
 	}
 	buffer = malloc(size + 1);
 	if (!buffer)
@@ -137,7 +125,8 @@ char	*get_next_line(int fd)
 	char			*newline;
 	static t_list	*lst = NULL;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, newline, 0) < 0)
+	len = 0;
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, newline, BUFFER_SIZE) < 0)
 		return (NULL);
 	lst = ft_get_list(lst, fd, &len);
 	newline = ft_get_newline(lst, &len);
@@ -145,21 +134,21 @@ char	*get_next_line(int fd)
 	return (newline);
 }
 
-// #include <fcntl.h>
-// #include <stdio.h>
+#include <fcntl.h>
+#include <stdio.h>
 
-// int main(void)
-// {
-// 	int fd;
-// 	char *str;
-// 	char *buffer;
+int main(void)
+{
+	int fd;
+	char *str;
+	char *buffer;
 
-// 	fd = open("sample.txt", O_RDONLY);
-// 	str = get_next_line(fd);
-// 	printf("%s\n", str);
-// 	str = get_next_line(fd);
-// 	printf("%s\n", str);
-// 	// str = get_next_line(fd);
-// 	// printf("%s\n", str);
+	fd = open("sample.txt", O_RDONLY);
+	str = get_next_line(fd);
+	printf("%s\n", str);
+	str = get_next_line(fd);
+	printf("%s\n", str);
+	// str = get_next_line(fd);
+	// printf("%s\n", str);
 
-// }
+}
