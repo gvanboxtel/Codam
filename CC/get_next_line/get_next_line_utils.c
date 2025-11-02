@@ -6,22 +6,13 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:07:06 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/10/31 17:36:49 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/02 15:37:43 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stddef.h>
 #include <stdlib.h>
 #include "get_next_line.h"
-
-t_list	*ft_lstlast(t_list *lst)
-{
-	if (lst == NULL)
-		return (lst);
-	while (lst->next)
-		lst = lst->next;
-	return (lst);
-}
 
 t_list	*ft_lstnew(void *content)
 {
@@ -43,7 +34,9 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 		*lst = new;
 	else
 	{
-		temp = ft_lstlast(*lst);
+		while ((*lst)->next)
+			*lst = (*lst)->next;
+		temp = *lst;
 		temp->next = new;
 	}
 }

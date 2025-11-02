@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:06:48 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/01 15:16:58 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/02 15:31:58 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,24 @@ char	*ft_get_newline(t_list *lst, size_t *len)
 	return (start);
 }
 
+void	ft_find_offset(t_list *lst, size_t *len, size_t *offset)
+{
+	*offset = 0;
+	while (lst)
+	{
+		if (ft_strlen(lst->content) < *len)
+		{
+			*len -= ft_strlen(lst->content);
+			lst = lst->next;
+		}
+		else
+		{
+			*offset = *len + 1;
+			return ;
+		}
+	}
+}
+
 t_list	*ft_clean_list(t_list *lst, size_t *len)
 {
 	char	*buffer;
@@ -96,19 +114,7 @@ t_list	*ft_clean_list(t_list *lst, size_t *len)
 	size = 0;
 	if (lst == NULL)
 		return (NULL);
-	while (lst)
-	{
-		if (ft_strlen(lst->content) < *len)
-		{
-			*len -= ft_strlen(lst->content);
-			lst = lst->next;
-		}
-		else
-		{
-			offset = *len + 1;
-			break ;
-		}
-	}
+	ft_find_offset(&lst, &len, &offset);
 	start = lst->content + offset;
 	str = (char *)lst->content;
 	while (str[offset])
