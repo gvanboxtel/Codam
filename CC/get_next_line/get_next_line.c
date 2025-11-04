@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:06:48 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/02 16:22:57 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/04 06:53:33 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,14 @@ static char	*ft_buffer(int fd)
 	if (!buffer)
 		return (NULL);
 	char_read = read(fd, buffer, BUFFER_SIZE);
-	if (!char_read)
+	if (char_read < 0)
 	{
 		free(buffer);
 		return (NULL);
+	}
+	if (char_read == 0)
+	{
+		
 	}
 	buffer[char_read] = '\0';
 	return (buffer);
