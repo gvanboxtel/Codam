@@ -3,76 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvan-box <gvan-box@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:07:06 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/03 13:19:04 by gvan-box         ###   ########.fr       */
+/*   Updated: 2025/11/18 17:17:24 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "get_next_line.h"
-
-t_list	*ft_lstnew(void *content, size_t n)
-{
-	t_list	*node;
-	char	*str;
-	char	*buffer;
-
-	str = (char *)content;
-	node = (t_list *)malloc(sizeof(t_list));
-	if (node == NULL)
-		return (NULL);
-	buffer = malloc(n);
-	if (!buffer)
-		return (NULL);
-	ft_strlcpy(buffer, str, n);
-	node->content = buffer;
-	node->next = NULL;
-	return (node);
-}
-
-void	ft_lstadd_back(t_list **lst, t_list *new)
-{
-	t_list	*temp;
-
-	if (*lst == NULL)
-		*lst = new;
-	else
-	{
-		temp = *lst;
-		while (temp->next)
-			temp = temp->next;
-		temp->next = new;
-	}
-}
-
-void	ft_lstclear(t_list **lst, void (*del)(void*))
-{
-	t_list	*current;
-	t_list	*nextnode;
-
-	if (*lst == NULL)
-		return ;
-	current = *lst;
-	nextnode = current->next;
-	while (nextnode)
-	{
-		del(current->content);
-		free(current);
-		current = nextnode;
-		nextnode = current->next;
-	}
-	del(current->content);
-	free(current);
-	*lst = NULL;
-}
 
 size_t	ft_strlen(const char *s)
 {
 	const char	*iterator;
-
+	if (!s)
+		return (0);
 	iterator = s;
 	while (*iterator)
 		iterator++;
@@ -95,3 +42,78 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	}
 	return (ft_strlen(src));
 }
+
+char	*ft_strchr(const char *s, int c, size_t *len)
+{
+	while (*s)
+	{
+		if (*s == (char)c)
+		{
+			return ((char *)s);
+		}
+		s++;
+		(*len)++;
+	}
+	if ((char)c == '\0')
+		return ((char *)s);
+	return (NULL);
+}
+size_t	ft_strlcat(char *dst, const char *src, size_t size)
+{
+	char		*d;
+	const char	*s;
+	size_t		n;
+	size_t		dlen;
+
+	d = dst;
+	s = src;
+	n = size;
+	while (n-- && *d)
+		d++;
+	dlen = d - dst;
+	n = size - dlen;
+	if (n == 0)
+		return (dlen + ft_strlen(src));
+	while (--n && *s)
+		*d++ = *s++;
+	*d = '\0';
+	return (dlen + ft_strlen(src));
+}
+
+char	*ft_strjoin(char const *s1, char const *s2, int char_read)
+{
+	char	*catstr;
+
+	if (s2 == NULL)
+		return (NULL);
+	catstr = malloc(((ft_strlen(s1)) + (char_read + 1)));
+	if (catstr == NULL)
+		return (NULL);
+	ft_strlcpy(catstr, s1, ft_strlen(s1) + 1);	
+	ft_strlcat(catstr, s2, ft_strlen(s1) + char_read + 1);	
+	return (catstr);
+}
+
+void	*ft_memmove(void *dest, const void *src, size_t n)
+{
+	unsigned char		*d;
+	const unsigned char	*s;
+
+	d = dest;
+	s = src;
+	if (s < d)
+	{
+		s += n;
+		d += n;
+		while (n--)
+			*--d = *--s;
+	}
+	else
+	{
+		while (n--)
+			*d++ = *s++;
+	}
+	return (dest);
+}
+
+

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvan-box <gvan-box@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:06:48 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/03 13:17:28 by gvan-box         ###   ########.fr       */
+/*   Updated: 2025/11/18 18:01:27 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,131 +14,105 @@
 #include <stdlib.h>
 #include <string.h>
 #include "get_next_line.h"
-#define BUFFER_SIZE 50
+#define BUFFER_SIZE 5
 
 #include <stdio.h>
 
-static char	*ft_get_buffer(int fd)
+char	*ft_get_newline(int fd, char *buffer, int char_read, char *temp)
 {
-	char	*buffer;
-	int		char_read;
+	size_t	len;	
 
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
-		return (NULL);
-	char_read = read(fd, buffer, BUFFER_SIZE);
-	if (char_read < 0)
+	len = 0;
+	if (!*buffer)
+		return (NULL); 
+	if (ft_strchr(buffer, '\n', &len))
 	{
-		free(buffer);
+		ft_strlcpy(temp, buffer, len + 2);
+		return (temp);
+	}
+	ft_strlcpy(temp, buffer, ft_strlen(buffer) + 1);
+	if (!*temp)
 		return (NULL);
-	}
-	if (char_read == 0)
-	{
-		//printf("check");
-		buffer[char_read] = '\0';
-		return (buffer);
-	}
-
-	buffer[char_read] = '\0';
-	return (buffer);
+	return (temp);	
 }
 
-static t_list	*ft_get_list(t_list *lst, int fd, size_t *len)
+char	*ft_read_buffer(int fd, char *buf_read, char **buf_static, char *temp)
 {
-	char	*buffer;
-	size_t	i;
-
-	i = 0;
-	*len = 0;
-	buffer = ft_get_buffer(fd);
-	while (buffer[i] != '\n' && *buffer)
+	int 	char_read;
+	size_t	len;
+	
+	while (ft_strchr(buf_read, '\n', &len) == NULL)
 	{
-		i++;
-		(*len)++;
-		if (buffer[i] == '\0')
-		{
-			ft_lstadd_back(&lst, ft_lstnew(buffer));
-			buffer = ft_get_buffer(fd);
-			i = 0;
-		}
-	}
-	ft_lstadd_back(&lst, ft_lstnew(buffer));
-	return (lst);
+		char_read = read(fd, buf_read, BUFFER_SIZE);
+		if (char_read < 0)
+			return (NULL);
+		else if (char_read == 0)
+			return (ft_get_newline(fd, buf_read, char_read, temp));	
+		*buf_static = ft_strjoin(*buf_static, buf_read, char_read);
+		if (!*buf_static)
+			return (NULL);
+	}	
+	return (ft_get_newline(fd, *buf_static, char_read, temp));
+		
 }
 
-static char	*ft_get_newline(t_list *lst, size_t *len)
+char	*ft_read_static(char **buf_static, int fd, char *temp, char *buf_read)
 {
-	char	*content;
-	char	*str;
-	char	*start;
+	size_t len;
 
-	str = malloc(*len + 1);
-	if (!str)
-		return (NULL);
-	start = str;
-	while (lst)
-	{
-		content = lst->content;
-		//printf("Content: %s\n", content);
-		while (*content != '\n' && *content)
-		{
-			*str++ = *content++;
-			if (*content == '\n')
-			{
-				*str++ = *content;
-				*str = '\0';
-				return (start);
-			}
-		}
-		lst = lst->next;
-	}
-	return (start);
+	len = 0;
+	ft_strchr(*buf_static, '\n', &len);
+	ft_memmove(*buf_static, *buf_static + len + 1, BUFFER_SIZE + 1 - len);
+	if (!ft_strchr(*buf_static, '\n', &len))
+		return (ft_read_buffer(fd, buf_read, buf_static, temp));
+	return (ft_get_newline(fd, *buf_static, ft_strlen(*buf_static), temp));
 }
 
-static t_list	*ft_clean_list(t_list *lst, size_t *len)
+char	*ft_error_handling(char	**buf_read, char **buf_static, int fd)
 {
-	char	*buffer;
-	char	*str;
-	size_t	size;
-	char	*start;
+	char	*non_error;
 
-	size = 0;
-	while (lst->next)
+	non_error = "no error";	
+	if (*buf_read == NULL)
 	{
-		if (ft_strlen(lst->content) < *len)
-			*len -= ft_strlen(lst->content);
-		else
-			(*len)++;
-		lst = lst->next;
+		free(*buf_read);
+		free(*buf_static);
+		return (NULL);		
 	}
-	start = lst->content + (((*len)--) + 1);
-	str = (char *)lst->content;
-	while (str[(*len)++])
-		size++;
-	buffer = malloc(size + 1);
-	if (!buffer)
+	else if (*buf_static != NULL)
+	{
 		return (NULL);
-	ft_strlcpy(buffer, start, (size + 1));
-	ft_lstclear(&lst, free);
-	lst = ft_lstnew(buffer);
-	return (lst);
+	}
+	else	
+		return (non_error);	
 }
 
 char	*get_next_line(int fd)
 {
-	size_t			len;
 	char			*newline;
-	static t_list	*lst = NULL;
+	char			*buf_read;
+	char			*temp;
+	static char		*buf_static = NULL;	
 
-	len = 0;
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	lst = ft_get_list(lst, fd, &len);
-	if (lst == NULL)
+	temp = malloc(BUFFER_SIZE + 1);
+	if (!temp)
 		return (NULL);
-	newline = ft_get_newline(lst, &len);
-	lst = ft_clean_list(lst, &len);
-	return (newline);
+	buf_read = malloc(BUFFER_SIZE + 1);
+	if (!buf_read)
+		return (NULL);	
+	if (buf_static != NULL)
+	{		
+		newline = ft_read_static(&buf_static, fd, temp, buf_read);
+		if (!newline)
+			return(ft_error_handling(&buf_read, &buf_static, fd));
+		return (newline);
+	}
+	newline = ft_read_buffer(fd, buf_read, &buf_static, temp);
+	if (!newline)
+		return(ft_error_handling(&buf_read, &buf_static, fd));
+	return (newline);		
 }
 
 #include <fcntl.h>
@@ -152,15 +126,12 @@ int main(void)
 
 	fd = open("sample.txt", O_RDONLY);
 	str = get_next_line(fd);
-	//printf("%s", str);
-	free(str);
-	str = get_next_line(fd);
-	//printf("%s", str);
-	free(str);
-	str = get_next_line(fd);
-	//printf("%s", str);
-	free(str);
-	// str = get_next_line(fd);
-	// printf("%s\n", str);
+	while (str != NULL)
+	{
+		//printf("%s", str);
+		free(str);
+		str = get_next_line(fd);
+	}
+	close (fd);
 
 }
