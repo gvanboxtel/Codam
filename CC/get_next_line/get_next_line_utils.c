@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:07:06 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/18 17:17:24 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/19 12:21:47 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,10 +88,10 @@ char	*ft_strjoin(char const *s1, char const *s2, int char_read)
 		return (NULL);
 	catstr = malloc(((ft_strlen(s1)) + (char_read + 1)));
 	if (catstr == NULL)
-		return (NULL);
+		return (free((void *)s1), NULL);
 	ft_strlcpy(catstr, s1, ft_strlen(s1) + 1);	
 	ft_strlcat(catstr, s2, ft_strlen(s1) + char_read + 1);	
-	return (catstr);
+	return (free((void *)s1), catstr);
 }
 
 void	*ft_memmove(void *dest, const void *src, size_t n)
@@ -115,5 +115,3 @@ void	*ft_memmove(void *dest, const void *src, size_t n)
 	}
 	return (dest);
 }
-
-
