@@ -1,14 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_test.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/30 11:06:48 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/19 12:49:32 by marvin           ###   ########.fr       */
+/*   Created: 2025/11/23 15:20:55 by marvin            #+#    #+#             */
+/*   Updated: 2025/11/23 15:20:55 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -17,97 +18,82 @@
 #define BUFFER_SIZE 5
 #include <stdio.h>
 
-char	*ft_get_newline(int fd, char *buffer, char *temp)
+char	*ft_join(char *old_line, char *buffer)
 {
-	size_t	len;	
 
-	len = 0;
-	if (!buffer)
+	char	*new_line;
+	new_line = ft_strjoin(old_line, buffer);
+	return (free(old_line), new_line);
+}
+
+char	*ft_get_remainder(char **remainder, char *buffer)
+{
+	size_t	i;
+
+	i = 0;
+	while (buffer[i] != '\n')
+		i++;
+	*remainder = calloc(ft_strlen(buffer + i + 1) + 1, sizeof(char));
+	if (!*remainder)
 		return (NULL);
-	if (ft_strchr(buffer, '\n', &len))
-	{
-		ft_strlcpy(temp, buffer, len + 2);
-		return (temp);
-	}
-	ft_strlcpy(temp, buffer, ft_strlen(buffer) + 1);
-	if (!*temp)
-		return (NULL); 	
-	return (temp);	
+	*remainder = ft_memmove(*remainder, buffer + i + 1, ft_strlen(buffer + i + 1));
+	return (*remainder);
 }
 
-char	*ft_read_buffer(int fd, char *buf_read, char **buf_static, char *temp)
+char	*ft_get_newline(char *new_line)
 {
-	int 	char_read;
-	size_t	len;
-	
-	len = 0;
-	while (ft_strchr(buf_read, '\n', &len) == NULL)
+	size_t	i;
+
+	i = 0;
+	while (new_line[i] != '\n')
+		i++;
+	new_line[i + 1] = '\0';
+	return (new_line);
+}
+
+char	*ft_read(int fd, char	*new_line, char **remainder)
+{
+	char	buffer[BUFFER_SIZE + 1];
+	int		bytes_read;
+
+	buffer[0] = '\0';
+	while (!new_line || ft_strchr(new_line, '\n') == NULL)
 	{
-		char_read = read(fd, buf_read, BUFFER_SIZE);
-		if (char_read < 0)
-			return (NULL);
-		else if (char_read == 0)
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read < 0 )			
+			return (free(*remainder), *remainder = NULL, NULL);		
+		else if (bytes_read == 0)
 		{
-			temp = ft_get_newline(fd, *buf_static, temp);
-			return (free(*buf_static), *buf_static = NULL, temp);
+			if (!new_line)
+				return (NULL);
+			buffer[bytes_read] = '\0';
+			new_line = ft_join(new_line, buffer);			
+			return (free(*remainder), *remainder = NULL, new_line);
 		}
-		*buf_static = ft_strjoin(*buf_static, buf_read, char_read);
-		if (!*buf_static)
-			return (NULL);
-	}	
-	return (ft_get_newline(fd, *buf_static, temp));}
-
-char	*ft_read_static(char **buf_static, int fd, char *temp, char *buf_read)
-{
-	size_t len;
-	size_t static_len;
-
-	len = 0;
-	static_len = ft_strlen(*buf_static);
-	if (!ft_strchr(*buf_static, '\n', &len))
-		return (ft_read_buffer(fd, buf_read, buf_static, temp));
-	
-	ft_memmove(*buf_static, *buf_static + len + 1, static_len - len);	
-	if (ft_strchr(*buf_static, '\n', &len))
-		return (ft_get_newline(fd, *buf_static, temp));
-	return (ft_read_buffer(fd, buf_read, buf_static, temp));
+		buffer[bytes_read] = '\0';
+		new_line = ft_join(new_line, buffer);
+	}
+	if (!*buffer)
+		ft_strlcpy(buffer, new_line, ft_strlen(new_line) + 1);
+	*remainder = ft_get_remainder(remainder, buffer);
+	return (ft_get_newline(new_line));	
 }
 
-char	*ft_error_handling(char	**buf_read, char **buf_static, char **temp)
-{
-	free(*buf_read);
-	free(*temp);
-	free(*buf_static);
-	*buf_static = NULL;
-	return (NULL);	
-}
 
 char	*get_next_line(int fd)
 {
-	char			*newline;
-	char			*buf_read;
-	char			*temp;
-	static char		*buf_static = NULL;	
+	static char	*remainder[1024];
+	char		*new_line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	temp = malloc(BUFFER_SIZE + 1);
-	if (!temp)
-		return (NULL);	
-	buf_read = calloc(BUFFER_SIZE + 1, sizeof(char));
-	if (!buf_read)
-		return (ft_error_handling(&buf_read, &buf_static, &temp));	
-	if (buf_static != NULL)
-	{		
-		newline = ft_read_static(&buf_static, fd, temp, buf_read);
-		if (!newline)
-			return(ft_error_handling(&buf_read, &buf_static, &temp));
-		return (free(buf_read), newline);
+	new_line = NULL;
+	if (remainder[fd])
+	{
+		new_line = ft_join(new_line, remainder[fd]);
+		free(remainder[fd]);
+		remainder[fd] = NULL;
 	}
-	newline = ft_read_buffer(fd, buf_read, &buf_static, temp);
-	if (!newline)
-		return(ft_error_handling(&buf_read, &buf_static, &temp));
-	return (free(buf_read), newline);		
+	new_line = ft_read(fd, new_line, &remainder[fd]);
+	return (new_line);
 }
 
 #include <fcntl.h>

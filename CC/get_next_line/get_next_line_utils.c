@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/30 11:07:06 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/11/19 12:21:47 by marvin           ###   ########.fr       */
+/*   Updated: 2025/11/23 15:36:24 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-char	*ft_strchr(const char *s, int c, size_t *len)
+char	*ft_strchr(const char *s, int c)
 {
 	while (*s)
 	{
@@ -52,7 +52,6 @@ char	*ft_strchr(const char *s, int c, size_t *len)
 			return ((char *)s);
 		}
 		s++;
-		(*len)++;
 	}
 	if ((char)c == '\0')
 		return ((char *)s);
@@ -80,18 +79,18 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 	return (dlen + ft_strlen(src));
 }
 
-char	*ft_strjoin(char const *s1, char const *s2, int char_read)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*catstr;
 
 	if (s2 == NULL)
 		return (NULL);
-	catstr = malloc(((ft_strlen(s1)) + (char_read + 1)));
+	catstr = malloc(((ft_strlen(s1)) + (ft_strlen(s2) + 1)));
 	if (catstr == NULL)
-		return (free((void *)s1), NULL);
+		return (NULL);
 	ft_strlcpy(catstr, s1, ft_strlen(s1) + 1);	
-	ft_strlcat(catstr, s2, ft_strlen(s1) + char_read + 1);	
-	return (free((void *)s1), catstr);
+	ft_strlcat(catstr, s2, ft_strlen(s1) + ft_strlen(s2) + 1);	
+	return (catstr);
 }
 
 void	*ft_memmove(void *dest, const void *src, size_t n)
