@@ -3,40 +3,56 @@
 /*                                                        :::      ::::::::   */
 /*   swap.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvan-box <gvan-box@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 16:08:38 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/12/08 16:25:18 by gvan-box         ###   ########.fr       */
+/*   Updated: 2025/12/09 11:56:57 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void swap_a(int **list_a)
-{
-	int i;
-	int temp;
+#include "push_swap.h"
 
-	i = 0;
-	if ((!(*list_a)[i]) || ((*list_a)[i] && !(*list_a)[i +1]))
-		return ;
-	temp = (*list_a)[0];
-	(*list_a)[0] = (*list_a)[1];
-	(*list_a)[1] = temp;
+void swap_a(stack **list_a)
+{
+    stack *first;
+    stack *second;
+    stack *third;
+	
+    if (!list_a || !*list_a || !(*list_a)->next)
+        return;
+    first = *list_a;
+    second = first->next;
+    third = second->next;    
+    second->prev = NULL;
+    second->next = first;
+    first->prev = second;
+    first->next = third;
+    if (third)
+        third->prev = first;    
+    *list_a = second;
 }
 
-void swap_b(int **list_b)
+void swap_b(stack **list_b)
 {
-	int i;
-	int temp;
-
-	i = 0;
-	if ((!(*list_b)[i]) || ((*list_b)[i] && !(*list_b)[i +1]))
-		return ;
-	temp = (*list_b)[0];
-	(*list_b)[0] = (*list_b)[1];
-	(*list_b)[1] = temp;
+    stack *first;
+    stack *second;
+    stack *third;
+	
+    if (!list_b || !*list_b || !(*list_b)->next)
+        return;
+    first = *list_b;
+    second = first->next;
+    third = second->next;    
+    second->prev = NULL;
+    second->next = first;
+    first->prev = second;
+    first->next = third;
+    if (third)
+        third->prev = first;    
+    *list_b = second;
 }
 
-void ss(int **list_a, int **list_b)
+void ss(stack **list_a, stack **list_b)
 {
 	swap_a(list_a);
 	swap_b(list_b);

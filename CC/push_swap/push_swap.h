@@ -4,15 +4,29 @@
 # include <stddef.h>
 # include <stdarg.h>
 # include <stdint.h>
-# include "ft_printf.h"
+// # include "ft_printf.h"
 # include "libft.h"
 
-int *swap_a(int *list_a);
-void swap_b(int **list_b);
-void ss(int **list_a, int **list_b);
-void push_a(int **list_a, int **list_b, int counter);
-void push_b(int **list_a, int **list_b, int counter);
+typedef struct node {
+    int content;
+    struct node *next;
+    struct node *prev;
+} stack;
 
-
+void	swap_a(stack **list_a);
+void	swap_b(stack **list_b);
+void	ss(stack **list_a, stack **list_b);
+void	push_a(int **list_a, int **list_b, int counter);
+void	push_b(int **list_a, int **list_b, int counter);
+void	rotate_a(stack **list_a);
+void	rotate_b(stack **list_b);
+void	rr(stack **list_a, stack **list_b);
+void	reverse_rotate_a(stack **list_a);
+void	reverse_rotate_b(stack **list_b);
+void	rrr(stack **list_a, stack **list_b);
+stack	*ft_lstnew_double(int content);
+stack	*ft_lstlast_double(stack *lst);
+void	ft_lstadd_back_double(stack **lst, stack *new);
+void	ft_lstadd_front_double(stack **lst, stack *new);
 
 #endif

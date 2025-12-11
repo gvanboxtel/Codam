@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvan-box <gvan-box@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 15:08:27 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/12/08 17:08:09 by gvan-box         ###   ########.fr       */
+/*   Updated: 2025/12/09 12:02:12 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include "push_swap.h"
 
+#include <stdio.h>
 
 int *make_list(int counter, char **argv)
 {
@@ -36,8 +37,8 @@ int *make_list(int counter, char **argv)
 int main_test(int argc, char **argv)
 {
 	int i;
-	int *list_a;
-	int *list_b;
+	stack *list_a = NULL;
+	stack *list_b = NULL;
 
 	i = 1;
 	if (argc > 1)
@@ -45,7 +46,7 @@ int main_test(int argc, char **argv)
 		while (i < argc && argv[i][0])
 		{
 			if (ft_isdigit(argv[i][0]))
-				;
+				ft_lstadd_back_double(&list_a, ft_lstnew_double(ft_atoi(argv[i])));
 			else
 			{
 				write(2, "Error: Not a valid input\n", 25);
@@ -59,26 +60,25 @@ int main_test(int argc, char **argv)
 		write(2, "Error: No arguments were provided\n", 34);
 		exit (1);
 	}
-	list_b = ft_calloc((argc -1), sizeof(int));
-	if (!list_b)
-		return (1);
-	list_a = make_list((argc -1), argv);
+	swap_a(&list_a);
 	for(int i = 0; i < argc-1; i++)
 		{
-        	ft_printf("%d ", list_a[i]);
+        	printf("%d ", list_a->content);
+			list_a = list_a->next;
 		}
-	ft_printf("\n");
-	push_b(&list_a, &list_b, (argc-1));
-	for(int i = 0; i < argc-1; i++)
-	{
-		ft_printf("%d ", list_b[i]);
-	}
-	ft_printf("\n");
-	push_a(&list_a, &list_b, (argc-1));
-	for(int i = 0; i < argc-1; i++)
-	{
-		ft_printf("%d ", list_a[i]);
-	}
+	printf("\n");
+	
+	// push_b(&list_a, &list_b, (argc-1));
+	// for(int i = 0; i < argc-1; i++)
+	// {
+	// 	ft_printf("%d ", list_b[i]);
+	// }
+	// ft_printf("\n");
+	// push_a(&list_a, &list_b, (argc-1));
+	// for(int i = 0; i < argc-1; i++)
+	// {
+	// 	ft_printf("%d ", list_a[i]);
+	// }
 
 
 
