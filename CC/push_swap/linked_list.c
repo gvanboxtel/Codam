@@ -21,6 +21,7 @@ stack	*ft_lstnew_double(int content)
 	if (node == NULL)
 		return (NULL);
 	node->content = content;
+	node->rank = 0;
 	node->next = NULL;
 	node->prev = NULL;
 	return (node);
@@ -68,5 +69,18 @@ void	ft_lstadd_front_double(stack **lst, stack *new)
 		(*lst)->prev = new;
 		*lst = new;
 	}
+}
+
+int	ft_lstsize_double(stack *lst)
+{
+	size_t	counter;
+
+	counter = 0;
+	while (lst)
+	{
+		counter++;
+		lst = lst->next;
+	}
+	return (counter);
 }
 

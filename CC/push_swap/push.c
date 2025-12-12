@@ -3,48 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   push.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: gvan-box <gvan-box@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/08 16:08:44 by gvan-box          #+#    #+#             */
-/*   Updated: 2025/12/10 08:43:28 by marvin           ###   ########.fr       */
+/*   Updated: 2025/12/12 11:40:47 by gvan-box         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
 // top of b and put it on a
-void push_a(stack **list_a, stack **list_b, int counter)
+void push_a(stack **list_a, stack **list_b)
 {
-	stack *top_b;
-	stack *top_a;
+	stack *second;
 
 	if (!(*list_b))
 		return ;
-	top_b = *list_b;
-	top_a = (*list_a);
-	top_a->prev = top_b;
-	(*list_a) = top_b;
-	if (top_b->next != NULL)
+	second = (*list_b)->next;
+	if (second)
+		second->prev = NULL;
+	if (!(*list_a))
 	{
-		top_b->next->prev = NULL;	
+		(*list_a) = (*list_b);
+		(*list_b)->next = NULL;
+		(*list_b)->prev = NULL;
+		(*list_b) = second;
+		return ;
 	}
-	(*list_b) = top_b->next;	
+	(*list_a)->prev = (*list_b);
+	(*list_b)->next = (*list_a);
+	(*list_a) = (*list_b);
+	if ((*list_b)->next != NULL)
+	{
+		(*list_b)->next->prev = NULL;
+	}
+	(*list_b) = second;
 }
 
-void push_b(int **list_a, int **list_b, int counter)
+void push_b(stack **list_a, stack **list_b)
 {
-	stack *top_b;
-	stack *top_a;
+	stack *second;
 
 	if (!(*list_a))
 		return ;
-	top_b = *list_b;
-	top_a = (*list_a);
-	top_b->prev = top_a;
-	(*list_b) = top_a;
-	if (top_a->next != NULL)
+	second = (*list_a)->next;
+	if (second)
+		second->prev = NULL;
+	if (!(*list_b))
 	{
-		top_a->next->prev = NULL;	
+		(*list_b) = (*list_a);
+		(*list_a)->next = NULL;
+		(*list_a)->prev = NULL;
+		(*list_a) = second;
+		return ;
 	}
-	(*list_a) = top_a->next;	
+	(*list_b)->prev = (*list_a);
+	(*list_a)->next = (*list_b);
+	(*list_b) = (*list_a);
+	if ((*list_a)->next != NULL)
+	{
+		(*list_a)->next->prev = NULL;
+	}
+	(*list_a) = second;
 }
